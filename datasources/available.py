@@ -143,13 +143,14 @@ def _availableat_sharp(dt):
 ##################################
 
 # NUCAPS DATA AVAILABILITY - JTS
-nucaps_conus_j01_url = "https://geo.nsstc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/j01/txt/"
-nucaps_conus_aq0_url = "https://geo.nsstc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/aq0/txt/"
-nucaps_conus_m01_url = "https://geo.nsstc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/m01/txt/"
-nucaps_conus_m02_url = "https://geo.nsstc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/m02/txt/"
-nucaps_conus_m03_url = "https://geo.nsstc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/m03/txt/"
-nucaps_caribbean_j01_url = "https://geo.nsstc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/caribbean/sharppy/j01/txt/"
-nucaps_alaska_j01_url = "https://geo.nsstc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/alaska/sharppy/j01/txt/"
+nucaps_conus_j01_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/j01/txt/"
+nucaps_conus_j02_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/j02/txt/"
+nucaps_conus_aq0_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/sharppy/aq0/txt/"
+nucaps_conus_m01_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/m01/txt/"
+nucaps_conus_m02_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/m02/txt/"
+nucaps_conus_m03_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/sharppy/m03/txt/"
+nucaps_caribbean_j01_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/caribbean/sharppy/j01/txt/"
+nucaps_alaska_j01_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/alaska/sharppy/j01/txt/"
 nucaps_text = ""
 
 ##################################

@@ -151,7 +151,7 @@ class Outlet(object):
                 DAY = str(line.split(',')[5])
                 TIME = str(line.split(',')[6])
 
-                remote_csv = f'https://geo.nsstc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/{region}/sharppy/{satID}/csv/{YEAR}{MONTH}{DAY}{TIME}/{satID}_{region}.csv'
+                remote_csv = f'https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/{region}/sharppy/{satID}/csv/{YEAR}{MONTH}{DAY}{TIME}/{satID}_{region}.csv'
                 self._csv_fields, self._points = loadNUCAPS_CSV(remote_csv)
             else:
                 # Do nothing if data source name in xml does not match the selected data source.
@@ -288,6 +288,7 @@ class Outlet(object):
         stns_avail = self.getPoints()
         if self._name.lower() in available.availableat and self._ds_name.lower() in available.availableat[self._name.lower()]:
             #avail = available.availableat[self._name.lower()][self._ds_name.lower()](dt)
+
             try:
                 avail = available.availableat[self._name.lower()][self._ds_name.lower()](dt)
                 stns_avail = []

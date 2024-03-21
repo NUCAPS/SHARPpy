@@ -55,6 +55,17 @@ ENDC = '\033[0m'
 BOLD = '\033[1m'
 UNDERLINE = '\033[4m'
 
+NUCAPS_reg_sat = {
+    "NUCAPS CONUS NOAA-20": ["conus", "j01"],
+    "NUCAPS CONUS NOAA-21": ["conus", "j02"],
+    "NUCAPS CONUS Aqua": ["conus", "aq0"],
+    "NUCAPS CONUS MetOp-A": ["conus", "m02"],
+    "NUCAPS CONUS MetOp-B": ["conus", "m01"],
+    "NUCAPS CONUS MetOp-C": ["conus", "m03"],
+    "NUCAPS Caribbean NOAA-20": ["caribbean", "j01"],
+    "NUCAPS Alaska NOAA-20": ["alaska", "j01"]
+}
+
 # Start the logging
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(pathname)s %(funcName)s Line #: %(lineno)d %(levelname)-8s %(message)s',
@@ -538,37 +549,15 @@ class Picker(QWidget):
             self.run_dropdown.update()
 
             if len(filtered_times) > 0:
-                # JTS -  Handle how real-time and off-line NUCAPS data is displayed.
-                if self.model == "NUCAPS Case Study NOAA-20" \
-                    or self.model == "NUCAPS Case Study Suomi-NPP" \
-                    or self.model == "NUCAPS Case Study Aqua" \
-                    or self.model == "NUCAPS Case Study MetOp-A" \
-                    or self.model == "NUCAPS Case Study MetOp-B" \
-                    or self.model == "NUCAPS Case Study MetOp-C":
+                # Reading in archived NUCAPS data
+                if ("NUCAPS Case Study" in self.model):
                     self.run_dropdown.clear()
                     self.run_dropdown.addItem(self.tr("- Viewing archived data - "))
                     self.run_dropdown.setCurrentIndex(0)
                     self.run_dropdown.update()
                     self.run_dropdown.setEnabled(False)
-                elif self.model == "NUCAPS CONUS NOAA-20" \
-                    or self.model == "NUCAPS CONUS Suomi-NPP" \
-                    or self.model == "NUCAPS CONUS Aqua" \
-                    or self.model == "NUCAPS CONUS MetOp-A" \
-                    or self.model == "NUCAPS CONUS MetOp-B" \
-                    or self.model == "NUCAPS CONUS MetOp-C" \
-                    or self.model == "NUCAPS Caribbean NOAA-20" \
-                    or self.model == "NUCAPS Caribbean Suomi-NPP" \
-                    or self.model == "NUCAPS Caribbean Aqua" \
-                    or self.model == "NUCAPS Caribbean MetOp-A" \
-                    or self.model == "NUCAPS Caribbean MetOp-B" \
-                    or self.model == "NUCAPS Caribbean MetOp-C" \
-                    or self.model == "NUCAPS Alaska NOAA-20" \
-                    or self.model == "NUCAPS Alaska Suomi-NPP" \
-                    or self.model == "NUCAPS Alaska Aqua" \
-                    or self.model == "NUCAPS Alaska MetOp-A" \
-                    or self.model == "NUCAPS Alaska MetOp-B" \
-                    or self.model == "NUCAPS Alaska MetOp-C":
-
+                # Reading NUCAPS data
+                elif ("NUCAPS" in self.model) and ("Case Study" not in self.model):
                     # Load the empty csv for days that have no data and refresh the map.
                     self.data_sources = data_source.loadDataSources()
                     self.run_dropdown.setCurrentIndex(times.index(self.run))
@@ -581,38 +570,15 @@ class Picker(QWidget):
                     self.run_dropdown.setCurrentIndex(times.index(self.run))
                     self.run_dropdown.update()
                     self.run_dropdown.setEnabled(True)
+                    
             elif len(filtered_times) == 0:
-                if self.model == "Observed" \
-                    or self.model == "NUCAPS Case Study NOAA-20" \
-                    or self.model == "NUCAPS Case Study Suomi-NPP" \
-                    or self.model == "NUCAPS Case Study Aqua" \
-                    or self.model == "NUCAPS Case Study MetOp-A" \
-                    or self.model == "NUCAPS Case Study MetOp-B" \
-                    or self.model == "NUCAPS Case Study MetOp-C":
+                if ("Observed" in self.model) or ("NUCAPS" in self.model):
                     string = "obs"
-                elif self.model == "NUCAPS CONUS NOAA-20" \
-                    or self.model == "NUCAPS CONUS Suomi-NPP" \
-                    or self.model == "NUCAPS CONUS Aqua" \
-                    or self.model == "NUCAPS CONUS MetOp-A" \
-                    or self.model == "NUCAPS CONUS MetOp-B" \
-                    or self.model == "NUCAPS CONUS MetOp-C" \
-                    or self.model == "NUCAPS Caribbean NOAA-20" \
-                    or self.model == "NUCAPS Caribbean Suomi-NPP" \
-                    or self.model == "NUCAPS Caribbean Aqua" \
-                    or self.model == "NUCAPS Caribbean MetOp-A" \
-                    or self.model == "NUCAPS Caribbean MetOp-B" \
-                    or self.model == "NUCAPS Caribbean MetOp-C" \
-                    or self.model == "NUCAPS Alaska NOAA-20" \
-                    or self.model == "NUCAPS Alaska Suomi-NPP" \
-                    or self.model == "NUCAPS Alaska Aqua" \
-                    or self.model == "NUCAPS Alaska MetOp-A" \
-                    or self.model == "NUCAPS Alaska MetOp-B" \
-                    or self.model == "NUCAPS Alaska MetOp-C":
-                    # Load the empty csv for days that have no data and refresh the map.
-                    string = "obs"
-                    self.data_sources = data_source.loadDataSources()
+                    if ("Case Study" not in self.model):
+                        self.data_sources = data_source.loadDataSources()
                 else:
                     string = "runs"
+
                 self.run_dropdown.addItem(self.tr("- No " + string + " available - "))
                 self.run_dropdown.setCurrentIndex(0)
                 self.run_dropdown.update()
@@ -712,42 +678,53 @@ class Picker(QWidget):
         logging.debug("Calling full_gui.get_run")
 
         # JTS - The region and satID strings will be used to construct the dynamic path to the csv files in data_source.py.
-        if self.model == "NUCAPS CONUS NOAA-20":
-            region = 'conus'
-            satID = 'j01'
-        elif self.model == "NUCAPS CONUS Aqua":
-            region = 'conus'
-            satID = 'aq0'
-        elif self.model == "NUCAPS CONUS MetOp-A":
-            region = 'conus'
-            satID = 'm02'
-        elif self.model == "NUCAPS CONUS MetOp-B":
-            region = 'conus'
-            satID = 'm01'
-        elif self.model == "NUCAPS CONUS MetOp-C":
-            region = 'conus'
-            satID = 'm03'
-        elif self.model == "NUCAPS Caribbean NOAA-20":
-            region = 'caribbean'
-            satID = 'j01'
-        elif self.model == "NUCAPS Alaska NOAA-20":
-            region = 'alaska'
-            satID = 'j01'
+        # if self.model == "NUCAPS CONUS NOAA-20":
+        #     region = 'conus'
+        #     satID = 'j01'
+        # if self.model == "NUCAPS CONUS NOAA-21":
+        #     region = 'conus'
+        #     satID = 'j02'
+        # elif self.model == "NUCAPS CONUS Aqua":
+        #     region = 'conus'
+        #     satID = 'aq0'
+        # elif self.model == "NUCAPS CONUS MetOp-A":
+        #     region = 'conus'
+        #     satID = 'm02'
+        # elif self.model == "NUCAPS CONUS MetOp-B":
+        #     region = 'conus'
+        #     satID = 'm01'
+        # elif self.model == "NUCAPS CONUS MetOp-C":
+        #     region = 'conus'
+        #     satID = 'm03'
+        # elif self.model == "NUCAPS Caribbean NOAA-20":
+        #     region = 'caribbean'
+        #     satID = 'j01'
+        # elif self.model == "NUCAPS Alaska NOAA-20":
+        #     region = 'alaska'
+        #     satID = 'j01'
 
         # Write the data source, region, satellite ID, year, month, day and time info to a temporary text file.
         if self.model.startswith("NUCAPS"):
-            nucaps_year = self.cal_date.year()
-            nucaps_month = None
-            nucaps_day = None
 
-            if self.cal_date.month() < 10:
-                nucaps_month = f'0{self.cal_date.month()}'
-            else:
-                nucaps_month = self.cal_date.month()
-            if self.cal_date.day() < 10:
-                nucaps_day = f'0{self.cal_date.day()}'
-            else:
-                nucaps_day = self.cal_date.day()
+            lut = NUCAPS_reg_sat[self.model]
+            region = lut[0]
+            satID = lut[1]
+
+            nucaps_year = self.cal_date.year()
+            # nucaps_month = None
+            # nucaps_day = None
+
+            # if self.cal_date.month() < 10:
+            #     nucaps_month = f'0{self.cal_date.month()}'
+            # else:
+            #     nucaps_month = self.cal_date.month()
+            # if self.cal_date.day() < 10:
+            #     nucaps_day = f'0{self.cal_date.day()}'
+            # else:
+            #     nucaps_day = self.cal_date.day()
+
+            nucaps_day = str(self.cal_date.day()).zfill(2)
+            nucaps_month = str(self.cal_date.month()).zfill(2)
 
             nucaps_time = self.run_dropdown.currentText()[-8:-4]
             selected_ds = self.model
