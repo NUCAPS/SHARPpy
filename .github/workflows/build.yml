@@ -18,8 +18,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.11']
-        include:
-          - os: [macos-latest, windows-latest]
+        os: [macos-latest, windows-latest]
 
     # Control the os/python builds
     name: ${{ matrix.os }} Build and Release

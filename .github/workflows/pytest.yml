@@ -13,8 +13,7 @@ jobs:
     strategy:
       matrix:
         python-version: ['3.11']
-        include:
-          - os: [ubuntu-latest]
+        os: [ubuntu-latest]
 
     # Control the os/python builds
     name: Pytest ${{ matrix.os }} x ${{ matrix.python-version }}
