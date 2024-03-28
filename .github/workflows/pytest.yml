@@ -1,8 +1,8 @@
 name: pytest
-on:
-  push:
-    tags-ignore:
-      - v*.*.*
+on: push
+  # push:
+  #   tags-ignore:
+  #     - v*.*.*
 
 jobs:
   test:

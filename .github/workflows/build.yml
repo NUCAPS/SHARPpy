@@ -3,10 +3,10 @@
 # git push origin v*.*.*
 
 name: build
-on:
-  push:
-    tags:
-      - v*.*.*
+on: push
+  # push:
+  #   tags:
+  #     - v*.*.*
 
 
 jobs:
