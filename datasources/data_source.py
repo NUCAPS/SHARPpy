@@ -1,7 +1,7 @@
 
 import xml.etree.ElementTree as ET
 import glob, os, sys, shutil
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 try:
     from urllib2 import urlopen, URLError
     from urllib import quote
@@ -183,14 +183,14 @@ class Outlet(object):
         if start == "-" or start is None:
             s = None
         elif start == "now":
-            s = datetime.utcnow()
+            s = datetime.now(timezone.utc)
         else:
             s = datetime.strptime(start, '%Y/%m/%d')
 
         if end == "-" or end is None:
             e = None
         elif end == 'now':
-            e = datetime.utcnow()
+            e = datetime.now(timezone.utc)
         else:
             e = datetime.strptime(end, '%Y/%m/%d')
         return [s, e]
@@ -241,7 +241,7 @@ class Outlet(object):
                 self._is_available = False
 
         if not self._custom_avail or custom_failed:
-            now = datetime.utcnow()
+            now = datetime.now(timezone.utc)
             cycles = self.getCycles()
             delay = self.getDelay()
             avail = [ now.replace(hour=hr, minute=0, second=0, microsecond=0) + timedelta(hours=delay) for hr in cycles ]
@@ -286,7 +286,8 @@ class Outlet(object):
         elif dt == datetime(1700,1,1,0,0,0):
             return []
         stns_avail = self.getPoints()
-        if self._name.lower() in available.availableat and self._ds_name.lower() in available.availableat[self._name.lower()]:
+
+        if (self._name.lower() in available.availableat) and (self._ds_name.lower() in available.availableat[self._name.lower()]):
             #avail = available.availableat[self._name.lower()][self._ds_name.lower()](dt)
 
             try:
@@ -294,6 +295,7 @@ class Outlet(object):
                 stns_avail = []
                 points = self.getPoints()
                 srcids = [ p['srcid'] for p in points ]
+
                 for stn in avail:
                     try:
                         idx = srcids.index(stn)
@@ -307,6 +309,7 @@ class Outlet(object):
                 logging.exception(err)
                 stns_avail = []
                 self._is_available = False
+                
         logging.debug("_is_available: "+ str(self._is_available))
         logging.debug('Number of stations found:' + str(len(stns_avail)))
         return stns_avail
@@ -459,13 +462,7 @@ class DataSource(object):
         logging.debug("URL: " + url_base)
 
         # JTS - Format the URL differently for NUCAPS.
-        if self._name == 'NUCAPS CONUS NOAA-20' \
-            or self._name == 'NUCAPS CONUS Aqua' \
-            or self._name == 'NUCAPS CONUS MetOp-A' \
-            or self._name == 'NUCAPS CONUS MetOp-B' \
-            or self._name == 'NUCAPS CONUS MetOp-C' \
-            or self._name == 'NUCAPS Caribbean NOAA-20' \
-            or self._name == 'NUCAPS Alaska NOAA-20':
+        if ("NUCAPS" in self._name):
             fmt = {
                 'srcid':quote(stn['srcid']),
                 'cycle':"%02d%02d" % (cycle_dt.hour, cycle_dt.minute),
@@ -517,8 +514,3 @@ if __name__ == "__main__":
     ds = dict( (n, ds[n]) for n in ['Observed', 'GFS', 'HRRR', 'NAM'] )
     print(ds['GFS'].updateTimeSpan())
     print(ds['HRRR'].updateTimeSpan())
-#    for n, d in ds.items():
-#       print n, d.getMostRecentCycle()
-        #times = d.getAvailableTimes()
-        #for t in times:
-        #    print(n, t, [ s['srcid'] for s in d.getAvailableAtTime(t) ])

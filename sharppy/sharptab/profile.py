@@ -204,7 +204,7 @@ class Profile(object):
 
         snd_loc = (" " * (4 - len(self.location))) + self.location
 
-        now = datetime.utcnow()
+        now = datetime.now(timezone.utc)
         #print(now, self.date)
         user = getpass.getuser()
         snd_file.write("%TITLE%\n")

@@ -33,7 +33,7 @@ if len(sys.argv) > 1 and sys.argv[1] == "SARS":
 				wdir=wdir, wspd=wspd, location=sys.argv[1])
 
 elif len(sys.argv) > 1 and sys.argv[1] != "test":
-    gmtime = datetime.datetime.utcnow()
+    gmtime = datetime.datetime.now(datetime.timezone.utc)
     t_str = str( gmtime )
     year = t_str[2:4]
     month = t_str[5:7]

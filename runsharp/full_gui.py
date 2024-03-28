@@ -181,7 +181,7 @@ class crasher(object):
 class Calendar(QCalendarWidget):
     def __init__(self, *args, **kwargs):
         dt_earliest = kwargs.pop('dt_earliest', date.datetime(1946, 1, 1))
-        dt_avail = kwargs.pop('dt_avail', date.datetime.utcnow().replace(
+        dt_avail = kwargs.pop('dt_avail', date.datetime.now(date.timezone.utc).replace(
             minute=0, second=0, microsecond=0))
         self.max_date = dt_avail.date()
         super(Calendar, self).__init__(*args, **kwargs)
@@ -677,32 +677,6 @@ class Picker(QWidget):
         """
         logging.debug("Calling full_gui.get_run")
 
-        # JTS - The region and satID strings will be used to construct the dynamic path to the csv files in data_source.py.
-        # if self.model == "NUCAPS CONUS NOAA-20":
-        #     region = 'conus'
-        #     satID = 'j01'
-        # if self.model == "NUCAPS CONUS NOAA-21":
-        #     region = 'conus'
-        #     satID = 'j02'
-        # elif self.model == "NUCAPS CONUS Aqua":
-        #     region = 'conus'
-        #     satID = 'aq0'
-        # elif self.model == "NUCAPS CONUS MetOp-A":
-        #     region = 'conus'
-        #     satID = 'm02'
-        # elif self.model == "NUCAPS CONUS MetOp-B":
-        #     region = 'conus'
-        #     satID = 'm01'
-        # elif self.model == "NUCAPS CONUS MetOp-C":
-        #     region = 'conus'
-        #     satID = 'm03'
-        # elif self.model == "NUCAPS Caribbean NOAA-20":
-        #     region = 'caribbean'
-        #     satID = 'j01'
-        # elif self.model == "NUCAPS Alaska NOAA-20":
-        #     region = 'alaska'
-        #     satID = 'j01'
-
         # Write the data source, region, satellite ID, year, month, day and time info to a temporary text file.
         if self.model.startswith("NUCAPS"):
 
@@ -711,17 +685,6 @@ class Picker(QWidget):
             satID = lut[1]
 
             nucaps_year = self.cal_date.year()
-            # nucaps_month = None
-            # nucaps_day = None
-
-            # if self.cal_date.month() < 10:
-            #     nucaps_month = f'0{self.cal_date.month()}'
-            # else:
-            #     nucaps_month = self.cal_date.month()
-            # if self.cal_date.day() < 10:
-            #     nucaps_day = f'0{self.cal_date.day()}'
-            # else:
-            #     nucaps_day = self.cal_date.day()
 
             nucaps_day = str(self.cal_date.day()).zfill(2)
             nucaps_month = str(self.cal_date.month()).zfill(2)
@@ -1119,7 +1082,7 @@ class Main(QMainWindow):
         """
         Creates and shows the "about" box.
         """
-        cur_year = date.datetime.utcnow().year
+        cur_year = date.datetime.now(date.timezone.utc).year
         msgBox = QMessageBox()
         documentationButton = msgBox.addButton(self.tr("Online Docs"), QMessageBox.ActionRole)
         bugButton = msgBox.addButton(self.tr("Report Bug"), QMessageBox.ActionRole)

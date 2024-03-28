@@ -7,7 +7,7 @@ except ImportError:
 import certifi
 import re
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 cache_len = timedelta(minutes=5)
 
@@ -19,7 +19,7 @@ goes_time = None
 # SHARP OBSERVED AVAILBILITY
 def _download_goes():
     global goes_time, goes_text
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     if goes_time is None or goes_time < now - cache_len:
         url_obj = urlopen(goes_base_url, cafile=certifi.where())
         goes_text = url_obj.read().decode('utf-8')
@@ -74,7 +74,7 @@ sharp_archive_time = None
 # SHARP OBSERVED AVAILBILITY
 def _download_sharp():
     global sharp_time, sharp_text
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     if sharp_time is None or sharp_time < now - cache_len:
         url_obj = urlopen(sharp_base_url, cafile=certifi.where())
         sharp_text = url_obj.read().decode('utf-8')
@@ -83,7 +83,7 @@ def _download_sharp():
 
 def _download_sharp_archive(dt):
     global sharp_time, sharp_text
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     base_url = 'http://sharp.weather.ou.edu/soundings/archive/%Y/%m/%d/'
     try:
         dt = datetime(dt.year(), dt.month(), dt.day(), 0,0,0)
@@ -142,27 +142,19 @@ def _availableat_sharp(dt):
 ##################################
 ##################################
 
-# NUCAPS DATA AVAILABILITY - JTS
-nucaps_conus_j01_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/j01/txt/"
-nucaps_conus_j02_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/j02/txt/"
-nucaps_conus_aq0_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/sharppy/aq0/txt/"
-nucaps_conus_m01_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/m01/txt/"
-nucaps_conus_m02_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/conus/sharppy/m02/txt/"
-nucaps_conus_m03_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/sharppy/m03/txt/"
-nucaps_caribbean_j01_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/caribbean/sharppy/j01/txt/"
-nucaps_alaska_j01_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/alaska/sharppy/j01/txt/"
+# NUCAPS DATA AVAILABILITY
+nucaps_base_url = "https://nssrgeo.ndc.nasa.gov/SPoRT/jpss-pg/nucaps/gridded/"
 nucaps_text = ""
 
-##################################
-# Retrieve the obs times for CONUS NOAA-20.
-def _download_nucaps_conus_j01():
+# Retrieve the obs times for NUCAPS
+def _download_nucaps(nucaps_url):
     global nucaps_text
-    nucaps_text = urlopen(nucaps_conus_j01_url, cafile=certifi.where()).read().decode('utf-8')
+    nucaps_text = urlopen(nucaps_url, cafile=certifi.where()).read().decode('utf-8')
     return nucaps_text
 
-def _available_nucaps_conus_j01(dt=None):
+def _available_nucaps(region = 'conus', sat = 'j01', dt=None):
     '''
-        _available_nucaps_conus_j01()
+        _available_nucaps_conus()
 
         Gets all of the available sounding times from the SPoRT FTP site.
 
@@ -172,157 +164,12 @@ def _available_nucaps_conus_j01(dt=None):
             Array of datetime objects that represents all the available times
             of sounding data on the SPoRT FTP site.
     '''
-    text = _download_nucaps_conus_j01()
+
+    nucaps_url = nucaps_base_url+region+"/sharppy/"+sat+"/txt/"
+
+    text = _download_nucaps(nucaps_url)
     matches = sorted(list(set(re.findall(">([\d]{12})</a", text))))
     return [ datetime.strptime(m, '%Y%m%d%H%M') for m in matches ]
-
-
-##################################
-# Retrieve the obs times for CONUS Aqua.
-def _download_nucaps_conus_aq0():
-    global nucaps_text
-    nucaps_text = urlopen(nucaps_conus_aq0_url, cafile=certifi.where()).read().decode('utf-8')
-    return nucaps_text
-
-def _available_nucaps_conus_aq0(dt=None):
-    '''
-        _available_nucaps_conus_aq0()
-
-        Gets all of the available sounding times from the SPoRT FTP site.
-
-        Returns
-        -------
-        matches : array
-            Array of datetime objects that represents all the available times
-            of sounding data on the SPoRT FTP site.
-    '''
-    text = _download_nucaps_conus_aq0()
-    matches = sorted(list(set(re.findall(">([\d]{12})</a", text))))
-    return [ datetime.strptime(m, '%Y%m%d%H%M') for m in matches ]
-
-
-#################################
-# Retrieve the obs times for CONUS MetOp-B.
-def _download_nucaps_conus_m01():
-    global nucaps_text
-    nucaps_text = urlopen(nucaps_conus_m01_url, cafile=certifi.where()).read().decode('utf-8')
-    return nucaps_text
-
-def _available_nucaps_conus_m01(dt=None):
-    '''
-        _available_nucaps_conus_m01()
-
-        Gets all of the available sounding times from the SPoRT FTP site.
-
-        Returns
-        -------
-        matches : array
-            Array of datetime objects that represents all the available times
-            of sounding data on the SPoRT FTP site.
-    '''
-    text = _download_nucaps_conus_m01()
-    matches = sorted(list(set(re.findall(">([\d]{12})</a", text))))
-    return [ datetime.strptime(m, '%Y%m%d%H%M') for m in matches ]
-
-
-#################################
-# Retrieve the obs times for CONUS MetOp-A.
-def _download_nucaps_conus_m02():
-    global nucaps_text
-    nucaps_text = urlopen(nucaps_conus_m02_url, cafile=certifi.where()).read().decode('utf-8')
-    return nucaps_text
-
-def _available_nucaps_conus_m02(dt=None):
-    '''
-        _available_nucaps_conus_m02()
-
-        Gets all of the available sounding times from the SPoRT FTP site.
-
-        Returns
-        -------
-        matches : array
-            Array of datetime objects that represents all the available times
-            of sounding data on the SPoRT FTP site.
-    '''
-    text = _download_nucaps_conus_m02()
-    matches = sorted(list(set(re.findall(">([\d]{12})</a", text))))
-    return [ datetime.strptime(m, '%Y%m%d%H%M') for m in matches ]
-
-
-#################################
-# Retrieve the obs times for CONUS MetOp-C.
-def _download_nucaps_conus_m03():
-    global nucaps_text
-    nucaps_text = urlopen(nucaps_conus_m03_url, cafile=certifi.where()).read().decode('utf-8')
-    return nucaps_text
-
-def _available_nucaps_conus_m03(dt=None):
-    '''
-        _available_nucaps_conus_m03()
-
-        Gets all of the available sounding times from the SPoRT FTP site.
-
-        Returns
-        -------
-        matches : array
-            Array of datetime objects that represents all the available times
-            of sounding data on the SPoRT FTP site.
-    '''
-    text = _download_nucaps_conus_m03()
-    matches = sorted(list(set(re.findall(">([\d]{12})</a", text))))
-    return [ datetime.strptime(m, '%Y%m%d%H%M') for m in matches ]
-
-
-#################################
-# Retrieve the obs times for Caribbean NOAA-20.
-def _download_nucaps_caribbean_j01():
-    global nucaps_text
-    nucaps_text = urlopen(nucaps_caribbean_j01_url, cafile=certifi.where()).read().decode('utf-8')
-    return nucaps_text
-
-def _available_nucaps_caribbean_j01(dt=None):
-    '''
-        _available_nucaps_caribbean_j01()
-
-        Gets all of the available sounding times from the SPoRT FTP site.
-
-        Returns
-        -------
-        matches : array
-            Array of datetime objects that represents all the available times
-            of sounding data on the SPoRT FTP site.
-    '''
-    text = _download_nucaps_caribbean_j01()
-    matches = sorted(list(set(re.findall(">([\d]{12})</a", text))))
-    return [ datetime.strptime(m, '%Y%m%d%H%M') for m in matches ]
-
-
-#################################
-# Retrieve the obs times for Alaska NOAA-20.
-def _download_nucaps_alaska_j01():
-    global nucaps_text
-    nucaps_text = urlopen(nucaps_alaska_j01_url, cafile=certifi.where()).read().decode('utf-8')
-    return nucaps_text
-
-def _available_nucaps_alaska_j01(dt=None):
-    '''
-        _available_nucaps_alaska_j01()
-
-        Gets all of the available sounding times from the SPoRT FTP site.
-
-        Returns
-        -------
-        matches : array
-            Array of datetime objects that represents all the available times
-            of sounding data on the SPoRT FTP site.
-    '''
-    text = _download_nucaps_alaska_j01()
-    matches = sorted(list(set(re.findall(">([\d]{12})</a", text))))
-    return [ datetime.strptime(m, '%Y%m%d%H%M') for m in matches ]
-
-
-##################################
-##################################
 
 # SPC DATA AVAILABLILY
 spc_base_url = "http://www.spc.noaa.gov/exper/soundings/"
@@ -331,7 +178,7 @@ spc_time = None
 
 def _download_spc():
     global spc_time, spc_text
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     if spc_time is None or spc_time < now - cache_len:
         url_obj = urlopen(spc_base_url, cafile=certifi.where())
         spc_text = url_obj.read().decode('utf-8')
@@ -399,7 +246,7 @@ def _download_psu():
             Lists the files within the PSU FTP site.
     '''
     global psu_time, psu_text
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     if psu_time is None or psu_time < now - cache_len:
         url_obj = urlopen(psu_base_url, cafile=certifi.where())
         psu_text = url_obj.read().decode('utf-8')
@@ -450,7 +297,7 @@ def _available_psu(model, dt=None):
             Specifies whether or not this is an off-hour run
     '''
 
-    if dt is not None and dt < datetime.utcnow() - timedelta(3600*29): # We know PSU is only a 24 hr service
+    if dt is not None and dt < datetime.now(timezone.utc) - timedelta(3600*29): # We know PSU is only a 24 hr service
         return []
 
     if model == '4km nam': model = 'nam4km'
@@ -478,7 +325,7 @@ def _download_iem():
             Lists the files within the IEM site.
     '''
     global iem_time, iem_text
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
     if iem_time is None or iem_time < now - cache_len:
         iem_obj = urlopen(iem_base_url, cafile=certifi.where())
         psu_text = url_obj.read().decode('utf-8')
@@ -530,7 +377,7 @@ def _available_iem(model, dt=None):
     '''
     #nam=(m in [ 'nam', '4km nam' ])
     if dt is None:
-        dt = datetime.utcnow()
+        dt = datetime.now(timezone.utc)
     else:
         try:
             a = int(dt.year)
@@ -543,7 +390,7 @@ def _available_iem(model, dt=None):
     # Either due to no data, depreciated modeling systems, etc.
     if dt < datetime(2010,12,30): # No Bufkit files before this date
         return []
-    if dt > datetime.utcnow() - timedelta(seconds=3600*24):
+    if dt > datetime.now(timezone.utc) - timedelta(seconds=3600*24):
         return []
     if model == 'ruc' and dt > datetime(2012,5,1,11,0,0): # RIP RUC
         return []
@@ -625,17 +472,16 @@ available = {
     'psu':{},
     'iem':{},
     'spc':{'observed': lambda dt=None: _available_spc(dt=dt)},
-#    'ou_pecan': {'pecan ensemble': lambda dt=None: _available_oupecan(dt=dt) },
-#    'ncar_ens': {'ncar ensemble': lambda dt=None: _available_ncarens(dt=dt) },
     'sharp': {'ncar ensemble': lambda dt=None: _available_ncarens(dt=dt), 'observed': lambda dt=None: _available_sharp(dt=dt), 'goes': lambda dt=None: _available_goes(dt=dt)},
     'local': {'local wrf-arw': lambda filename:  _available_local(filename)},
-    'stc': {'nucaps conus noaa-20': lambda dt=None: _available_nucaps_conus_j01(dt=dt), \
-            'nucaps conus aqua': lambda dt=None: _available_nucaps_conus_aq0(dt=dt), \
-            'nucaps conus metop-b': lambda dt=None: _available_nucaps_conus_m01(dt=dt), \
-            'nucaps conus metop-a': lambda dt=None: _available_nucaps_conus_m02(dt=dt), \
-            'nucaps conus metop-c': lambda dt=None: _available_nucaps_conus_m03(dt=dt), \
-            'nucaps caribbean noaa-20': lambda dt=None: _available_nucaps_caribbean_j01(dt=dt), \
-            'nucaps alaska noaa-20': lambda dt=None: _available_nucaps_alaska_j01(dt=dt)},
+    'stc': {'nucaps conus noaa-20': lambda dt=None: _available_nucaps(region="conus", sat="j01", dt=dt), \
+            'nucaps conus noaa-21': lambda dt=None: _available_nucaps(region="conus", sat="j02", dt=dt), \
+            'nucaps conus aqua': lambda dt=None: _available_nucaps(region="conus", sat="aq0", dt=dt), \
+            'nucaps conus metop-b': lambda dt=None: _available_nucaps(region="conus", sat="m01", dt=dt), \
+            'nucaps conus metop-a': lambda dt=None: _available_nucaps(region="conus", sat="m02", dt=dt), \
+            'nucaps conus metop-c': lambda dt=None: _available_nucaps(region="conus", sat="m03", dt=dt), \
+            'nucaps caribbean noaa-20': lambda dt=None: _available_nucaps(region="caribbean", sat="j01", dt=dt), \
+            'nucaps alaska noaa-20': lambda dt=None: _available_nucaps(region="alaska", sat="j01", dt=dt)},
 }
 
 # A dictionary containing paths to the stations for different observations, forecast models, etc.
@@ -660,7 +506,7 @@ for model in [ 'gfs', 'nam', 'rap', 'ruc', 'nam nest','hrrr' ]:
 
 if __name__ == "__main__":
 
-    dt = datetime.utcnow()
+    dt = datetime.now(timezone.utc)
     dt = available['spc']['observed'](dt)
     print(dt)
     print(availableat['spc']['observed'](dt[-1]))

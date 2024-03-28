@@ -4,20 +4,22 @@ channels:
   - conda-forge/label/testing
   - anaconda
 dependencies:
-  - python=3.9
+  - python=3.11
   - numpy>=1.15
   - pyside2>=5.12
   - qtpy
-  - sphinx
   - pytest
   - pytest-xvfb
-  - sphinx_rtd_theme
+  # SHARPpy Developers - uncomment below
+  # - sphinx
+  # - sphinx_rtd_theme
   - requests
   - python-dateutil
   - pyinstaller
   - setuptools
   - certifi
   - pip
-  - pip:
-    - sphinx-prompt
-    - pydocstyle
+  # SHARPpy Developers - uncomment below
+  # - pip:
+    # - sphinx-prompt
+    # - pydocstyle
