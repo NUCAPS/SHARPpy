@@ -61,7 +61,7 @@ def get_mean_pwv(station):
     else:
         station_idx = station_idx + 1
         ## get the PWV
-        mean_pwv = pwv_means[station_idx, 3:][0].astype(np.float)
+        mean_pwv = pwv_means[station_idx, 3:][0].astype(float)
     return mean_pwv
 
 def get_stdev_pwv(station):
@@ -111,7 +111,7 @@ def get_stdev_pwv(station):
     else:
         station_idx = station_idx + 1
         ## get the PWV
-        stdev_pwv = pwv_stdevs[station_idx, 3:][0].astype(np.float)
+        stdev_pwv = pwv_stdevs[station_idx, 3:][0].astype(float)
     return stdev_pwv
 
 def pwv_climo(prof, station, month=None):
