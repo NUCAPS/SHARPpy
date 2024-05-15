@@ -7,7 +7,7 @@ except ImportError:
     import queue as Queue
 import logging
 import hashlib
-from datetime import datetime
+from datetime import datetime, timezone
 import traceback
 
 class AsyncThreads(QObject):

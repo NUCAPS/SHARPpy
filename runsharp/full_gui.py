@@ -1203,7 +1203,7 @@ def search_and_plotDB(model, station, datetime, close=True, output='./'):
 
     string = OKGREEN + "Creating image for station %s using data source %s at time %s ..." + ENDC
     print( string % (station, model, datetime.strftime('%Y%m%d/%H%M')))
-    main_win.picker.skew.spc_widget.pixmapToFile(output + datetime.strftime('%Y%m%d.%H%M_' + model + '.png'))
+    main_win.picker.skew.spc_widget.pixmapToFile(output + datetime.strftime('%Y%m%d.%H%M_') + station + '_' + model + '.png')
     if close:
         main_win.picker.skew.close()
     return main_win
